@@ -1,0 +1,232 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd";>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<!--在head标签内引入jquery-->
+		<script src="jquery-1.8.1.min.js" type="text/javascript"></script>
+	</head>
+	<body>
+		<table border="1" cellspacing="0" cellpadding="0" style="text-align:center; float:left;">
+			<tr>
+				<td style="width: 50px">星级</td>
+				<td style="width: 50px">等级</td>
+				<td style="width: 150px">经验价值</td>
+				<td style="width: 150px">金币价值</td>
+				<td style="width: 150px">已拥有</td>
+				<td style="width: 150px">目标</td>
+			</tr>
+			<tr id="star2">
+				<td rowspan="20">2星</td>
+				<td>1</td>
+				<td name='exp'>0</td>
+				<td name='gold'>0</td>
+				<td><input style="text-align: center;" onkeyup='validate(this)' onafterpaste='validate(this)'></input></td>
+				<td><input style="text-align: center;" onkeyup='validate(this)' onafterpaste='validate(this)'></input></td>
+			</tr>
+			<tr id="star3">
+				<td rowspan="6">3星</td>
+				<td>20</td>
+				<td name='exp'>150000</td>
+				<td name='gold'>2</td>
+				<td><input style="text-align: center;" onkeyup='validate(this)' onafterpaste='validate(this)'></input></td>
+				<td><input style="text-align: center;" onkeyup='validate(this)' onafterpaste='validate(this)'></input></td>
+			</tr>
+			<tr id="star4">
+				<td rowspan="6">4星</td>
+				<td>25</td>
+				<td name='exp'>791420</td><!-- 341420+3*150000 -->
+				<td name='gold'>11</td>
+				<td><input style="text-align: center;" onkeyup='validate(this)' onafterpaste='validate(this)'></input></td>
+				<td><input style="text-align: center;" onkeyup='validate(this)' onafterpaste='validate(this)'></input></td>
+			</tr>
+			<tr id="star5">
+				<td>5星</td>
+				<td>30</td>
+				<td name='exp'>4292130</td><!-- 1126450+4*791420 -->
+				<td name='gold'>59</td><!-- 11+4+4*11 -->
+				<td><input style="text-align: center;" onkeyup='validate(this)' onafterpaste='validate(this)'></input></td>
+				<td><input style="text-align: center;" onkeyup='validate(this)' onafterpaste='validate(this)'></input></td>
+			</tr>
+			<tr>
+				<td colspan="5"></td>
+				<td ></td>
+			</tr>
+		</table>
+		<div style="float: left;margin-left: 30px">
+		</br>===================================
+		</br><button style="width: 150px;" onClick="Calculate()">计算所需经验/金币</button>
+		</br>已有经验：<font color="#FF0000" id="SumExp1"></font>
+		</br>目标经验：<font color="#FF0000" id="SumExp2"></font>
+		</br>已有金币：<font color="#FF0000" id="SumGold1"></font>
+		</br>目标金币：<font color="#FF0000" id="SumGold2"></font>
+		</br>已有->目标过程中，需要升级的白蛋：</font>
+		<div id="fix">
+			<div>
+				<input value="1" style="width:50px;text-align: center;" onkeyup="validate(this)" onafterpaste="validate(this)" />级 -> 
+				<input value="1" style="width:50px;text-align: center;" onkeyup="validate(this)" onafterpaste="validate(this)" />级 × 
+				<input value="1" style="width:50px;text-align: center;" onkeyup="validate(this)" onafterpaste="validate(this)" />
+				<button onClick="addFix()">+</button>
+				<button onClick="removeFix()">-</button>
+			</div>
+		</div>
+		</br>-----------------------------------
+		</br>所需经验：<font color="#FF0000" id="NeedExp"></font>
+		</br>所需金币：<font color="#FF0000" id="NeedGold"></font>
+		</br>===================================
+		</br>参战狗粮经验：<input value="0" style="width:100px;text-align: center;" id="battleExp1" onkeyup="validate(this)" onafterpaste="validate(this)" />×<input type="number" id="battleNumber" min="2" max="3" step="1" value="3" style="text-align:right;width: 35px">
+		</br>观战狗粮经验：<input value="0" style="width:100px;text-align: center;" id="battleExp2" onkeyup="validate(this)" onafterpaste="validate(this)" />×2
+		</br><button style="width: 150px" onClick="CalBattleParam();">计算战斗次数</button>
+		</br>所需战斗次数：<font color="#FF0000" id="NeedTimes"></font>
+		</br>所需体力：<font color="#FF0000" id="NeedPower"></font>
+		</br>===================================
+		</br>作者：竹之幽 苍之秋日
+		</br>欢迎来我空间留言点赞！(^__^) 
+		</div>
+
+	</body>
+	<script>
+		
+		$(function(){
+			initialTable();
+		});
+
+		function initialTable(){
+			for (var i = 2; i <21; i++) {
+				var exp1 = getSumExpBylevel(i);
+				var exp = exp1;
+
+				var gold1 = 0;
+				var gold2 = 0;
+				var gold3 = 0*0;
+				var gold = gold1+gold2+gold3;
+
+				var tr = $("<tr><td>"+i+"</td><td name='exp'>"+exp+"</td><td name='gold'>"+gold+"</td><td><input style='text-align: center;' onkeyup='validate(this)' onafterpaste='validate(this)'></input></td><td><input style='text-align: center;' onkeyup='validate(this)' onafterpaste='validate(this)'></input></td></tr>");
+				$('#star3').before(tr);
+			}
+			for (var i = 21; i <26; i++) {
+				var exp1 = getSumExpBylevel(i);
+				var exp = exp1;
+
+				var gold1 = 0;
+				var gold2 = 2;
+				var gold3 = 2*0;
+				var gold = gold1+gold2+gold3;
+
+				var tr = $("<tr><td>"+i+"</td><td name='exp'>"+exp+"</td><td name='gold'>"+gold+"</td><td><input style='text-align: center;' onkeyup='validate(this)' onafterpaste='validate(this)'></input></td><td><input style='text-align: center;' onkeyup='validate(this)' onafterpaste='validate(this)'></input></td></tr>");
+				$('#star4').before(tr);
+			}
+			for (var i = 26; i <31; i++) {
+				var exp1 = getSumExpBylevel(i);
+				var exp2 = 3*getSumExpBylevel(20);// 3个三星
+				var exp = exp1+exp2;
+
+				var gold1 = 2;
+				var gold2 = 3;
+				var gold3 = 3*2;
+				var gold = gold1+gold2+gold3;
+				var tr = $("<tr><td>"+i+"</td><td name='exp'>"+exp+"</td><td name='gold'>"+gold+"</td><td><input style='text-align: center;' onkeyup='validate(this)' onafterpaste='validate(this)'></input></td><td><input style='text-align: center;' onkeyup='validate(this)' onafterpaste='validate(this)'></input></td></tr>");
+				$('#star5').before(tr);
+			}
+		}
+
+		// N-1 到 N 级所需经验
+		function getExpBylevel(level){
+			// 升到奇数级，所需的经验
+			//exp1 = 2.5*Math.pow(x,3)+25*Math.pow(x,2)-12.5*x+165;
+			// 升到偶数级，所需的经验
+			//exp2 = 2.5*Math.pow(x,3)+22.5*Math.pow(x,2)-10*x+150;
+			//level = parseInt(level);
+			
+			return (level%2)*(2.5*Math.pow(level,3)+25*Math.pow(level,2)-12.5*level+165) + 
+				((level+1)%2)*(2.5*Math.pow(level,3)+22.5*Math.pow(level,2)-10*level+150);
+		}
+
+		// 1 到 N 级所需经验
+		function getSumExpBylevel(level){
+			var count = 0;
+			for (var i = 0; i <level-1; i++) {
+				count+=getExpBylevel(i+1);
+			}
+			
+			return count;
+		}
+
+		function validate(self){
+			self.value=self.value.replace(/\D/g,'');
+		}
+
+		// 计算所需经验
+		function Calculate(){
+			var SumExp1=0;
+			var SumExp2=0;
+			var SumGold1=0;
+			var SumGold2=0;
+			var FixExp=0;
+
+			for(var i=0;i<33;i++){
+				var Expi = $('td[name="exp"]')[i].innerHTML;
+				var Goldi = $('td[name="gold"]')[i].innerHTML;
+				var num1 = $('table input')[i*2].value==""?0:$('table input')[i*2].value;
+				var num2 = $('table input')[i*2+1].value==""?0:$('table input')[i*2+1].value;
+				SumExp1+=num1*Expi;
+				SumExp2+=num2*Expi;
+				SumGold1+=num1*Goldi;
+				SumGold2+=num2*Goldi;
+			}
+
+			// 由于使用白蛋 少用的经验
+			for(var j=0;j<$('#fix div').length;j++){
+				var StartLevel = $('#fix input')[j*3].value==""?1:$('#fix input')[j*3].value;
+				var EndLevel = $('#fix input')[j*3+1].value==""?1:$('#fix input')[j*3+1].value;
+				var number = $('#fix input')[j*3+2].value==""?1:$('#fix input')[j*3+2].value;
+				FixExp+= (getSumExpBylevel(EndLevel) - getSumExpBylevel(StartLevel))*number/2;
+				console.log(StartLevel);
+			}
+			
+
+			$('#SumExp1')[0].innerHTML=SumExp1;
+			$('#SumExp2')[0].innerHTML=SumExp2-FixExp;
+			$('#SumGold1')[0].innerHTML=SumGold1;
+			$('#SumGold2')[0].innerHTML=SumGold2;
+			$('#NeedExp')[0].innerHTML=SumExp2-SumExp1-FixExp;
+			$('#NeedGold')[0].innerHTML=SumGold2-SumGold1;
+
+
+		}
+
+		// 计算战斗次数
+		function CalBattleParam(){
+			
+
+			var NeedExp = $('#NeedExp')[0].innerHTML;
+			var battleExp1 = $('#battleExp1').val();
+			var battleExp2 = $('#battleExp2').val();
+			var battleNumber = $('#battleNumber').val();
+
+			// 校验
+			var reg = /^[2-3]$/;
+			if(!reg.test(battleNumber)){
+    			$('#battleNumber').val("3");
+    			battleNumber = 3;
+    		}
+
+			var PerExp = battleExp1*battleNumber + battleExp2*2;
+			if(PerExp==0)
+				return;
+
+			$('#NeedTimes')[0].innerHTML = parseInt(NeedExp/PerExp);
+			$('#NeedPower')[0].innerHTML = parseInt(NeedExp/PerExp*3);
+		}
+
+		function addFix(){
+			var div = $('<div><input value="1" style="width:50px;text-align: center;" onkeyup="validate(this)" onafterpaste="validate(this)" />级 -> <input value="1" style="width:50px;text-align: center;" onkeyup="validate(this)" onafterpaste="validate(this)" />级 × <input value="1" style="width:50px;text-align: center;" onkeyup="validate(this)" onafterpaste="validate(this)" /></div>');
+			div.appendTo($('#fix'));
+
+		}
+
+		function removeFix(){
+			if($('#fix div').length>1)
+				$('#fix div:last').remove();
+		}
+	</script>
+</html>
